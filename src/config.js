@@ -98,17 +98,13 @@ export const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''
 // Real Google reviews only, as { name: 'First L.', text: '...' } (first name + last initial,
 // typos fixed; leave out reviews that read like a shop visit). The section and its menu
 // link stay hidden while this is empty.
-// From the Google profile, Nov 2026 (all 5 stars). Left out: "Danny boy" (no real name).
+// From the Google profile, Nov 2026 (all 5 stars). Trimmed to the 4 most distinct at the owner's
+// request (the rest are one-line "Great job" / "Nice job"); "Danny boy" left out (no real name).
 export const REVIEWS = [
   { name: 'Chase C.', text: 'Details all my cars. Does a great job.' },
   { name: 'Teodoro F.', text: 'Great experience. Good job.' },
   { name: 'John D.', text: 'Nice job!!!' },
   { name: 'Ethan M.', text: 'Great job!' },
-  { name: 'Shayne B.', text: 'Nice job.' },
-  { name: 'Bryand H.', text: 'Great job.' },
-  { name: 'Trung V.', text: 'Great job.' },
-  { name: 'Albert T.', text: 'Nice job.' },
-  { name: 'Marcus A.', text: 'Great job.' },
 ]
 
 // Home page FAQ. Shown on the page and used for the FAQPage schema, so keep both in sync.
