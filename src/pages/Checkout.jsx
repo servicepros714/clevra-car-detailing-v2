@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { loadStripe } from '@stripe/stripe-js'
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { Elements, ExpressCheckoutElement, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { format, parseISO } from 'date-fns'
 import { ArrowLeft, Lock, Tag, X, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -20,15 +20,17 @@ function PayForm({ p, amount, prepay, onDone }) {
   const elements = useElements()
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
+  const [expressReady, setExpressReady] = useState(false)
 
+  // Card form submit and the Express Checkout buttons (Link, Apple Pay, Google Pay) both end here.
   async function pay(e) {
-    e.preventDefault()
+    e?.preventDefault?.()
     if (!stripe || !elements || busy) return
     setBusy(true); setMsg('')
     try {
       const { error: subErr } = await elements.submit()
       if (subErr) throw new Error(subErr.message)
-      const { clientSecret } = await createPaymentIntent({ serviceId: p.serviceId, addon: !!p.addon, prepay, email: p.info.email })
+      const { clientSecret } = await createPaymentIntent({ serviceId: p.serviceId, addon: !!p.addon, prepay, date: p.date, time: p.time, name: p.info.name, email: p.info.email })
       pending.set({ ...p, prepay })
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
@@ -53,6 +55,14 @@ function PayForm({ p, amount, prepay, onDone }) {
 
   return (
     <form onSubmit={pay} className="pay-form">
+      <div className={`express${expressReady ? ' is-ready' : ''}`}>
+        <ExpressCheckoutElement
+          onConfirm={() => pay()}
+          onReady={(ev) => setExpressReady(Boolean(ev?.availablePaymentMethods))}
+          options={{ buttonHeight: 48 }}
+        />
+      </div>
+      {expressReady && <p className="pay-divider mono"><span>or pay with card</span></p>}
       <PaymentElement options={{ layout: 'tabs', defaultValues: { billingDetails: { name: p.info.name, email: p.info.email, phone: p.info.phone } } }} />
       {msg && <p className="pay-form__err" role="alert">{msg}</p>}
       <button type="submit" className="btn btn-blade btn-block btn-lg" disabled={!stripe || busy}>

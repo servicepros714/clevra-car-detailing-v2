@@ -1,0 +1,16 @@
+// Worker clevra-car-detailing-v2 on the Remoticojobs account (same D1 as Alera, Apex, Aventa, Aurum, Blacktop, Bonnie, Bright Coat).
+{
+  "name": "clevra-car-detailing-v2",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "account_id": "805b4baa2eb5c30a80b36ab7e9548570",
+  "workers_dev": true,
+  "keep_vars": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "detailing-bookings-remoticojobs",
+      "database_id": "eb75d203-a2ac-406b-aa74-81c3060c21ab"
+    }
+  ]
+}

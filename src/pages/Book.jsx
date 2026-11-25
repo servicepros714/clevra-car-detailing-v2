@@ -24,7 +24,9 @@ export default function Book() {
   const nav = useNavigate()
   const saved = pending.get()
   const [step, setStep] = useState(saved?.step ?? 0)
-  const [serviceId, setServiceId] = useState(saved?.serviceId ?? null)
+  // Landing pages link to /book?service=basic|premium to preselect a package.
+  const preset = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('service') : null
+  const [serviceId, setServiceId] = useState(PACKAGES.some((p) => p.id === preset) ? preset : saved?.serviceId ?? null)
   const [addon, setAddon] = useState(saved?.addon ?? false)
   const [date, setDate] = useState(saved?.date ?? null)
   const [time, setTime] = useState(saved?.time ?? null)

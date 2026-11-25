@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Phone, Menu, X, Clock, MapPin, ArrowUpRight } from 'lucide-react'
-import { BUSINESS } from '../config'
+import { BUSINESS, REVIEWS } from '../config'
 
 const LINKS = [
   { to: '/#packages', label: 'Packages' },
   { to: '/#process', label: 'Process' },
   { to: '/#showroom', label: 'Showroom' },
   { to: '/#area', label: 'Service Area' },
+  ...(REVIEWS.length ? [{ to: '/#reviews', label: 'Reviews' }] : []),
   { to: '/#faq', label: 'FAQ' },
 ]
 

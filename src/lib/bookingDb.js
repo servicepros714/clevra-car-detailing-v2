@@ -1,64 +1,67 @@
-import { WORKER_URL, BUSINESS } from '../config'
+import { WORKER_URL } from '../config'
 
-// Local fallback so the site still works in dev before the Worker URL is wired.
-const LS_KEY = 'clevra_bookings'
+// Booking data layer: the Cloudflare Worker (worker/worker.js) + the shared D1 database.
+// The Worker prices everything from the service ids and checks card payments with Stripe,
+// so nothing the browser sends about price or payment status is trusted.
+
 const PENDING_KEY = 'clevra_pending_booking'
 const CONFIRMED_KEY = 'clevra_last_confirmation'
 
-const hasWorker = () => WORKER_URL && !WORKER_URL.includes('YOUR-SUBDOMAIN')
+const hasWorker = () => Boolean(WORKER_URL) && !WORKER_URL.includes('YOUR-SUBDOMAIN')
+export const workerConnected = hasWorker
 
-function readLocal() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]') } catch { return [] }
-}
-function writeLocal(list) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(list)) } catch { /* ignore */ }
+const serviceIds = ({ serviceId, addon }) => [serviceId, ...(addon ? ['exterior'] : [])]
+
+async function request(path, options = {}) {
+  if (!hasWorker()) throw new Error('Online booking is not connected yet. Please call us to book.')
+  let r
+  try {
+    r = await fetch(`${WORKER_URL}${path}`, { ...options, headers: { 'Content-Type': 'application/json' } })
+  } catch {
+    throw new Error('Could not reach the booking server. Check your connection and try again.')
+  }
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) {
+    const err = new Error(data.error || 'Something went wrong. Please call us.')
+    err.status = r.status
+    throw err
+  }
+  return data
 }
 
 export async function fetchBookedTimes(dateKey) {
-  if (!hasWorker()) {
-    return readLocal().filter((b) => b.date === dateKey).map((b) => b.time)
-  }
+  if (!hasWorker()) return []
   try {
-    const r = await fetch(`${WORKER_URL}/api/availability?date=${encodeURIComponent(dateKey)}`)
-    if (!r.ok) return []
-    const data = await r.json()
-    return Array.isArray(data.booked) ? data.booked : []
+    const d = encodeURIComponent(dateKey)
+    const data = await request(`/api/availability?start=${d}&end=${d}`)
+    return (data.booked && data.booked[dateKey]) || []
   } catch {
     return []
   }
 }
 
-export async function createBooking(payload) {
-  const body = { ...payload, source: BUSINESS.source }
-  if (!hasWorker()) {
-    const id = BUSINESS.idPrefix + Math.random().toString(36).slice(2, 8).toUpperCase()
-    const rec = { id, ...body, created_at: new Date().toISOString() }
-    writeLocal([...readLocal(), rec])
-    return rec
-  }
-  const r = await fetch(`${WORKER_URL}/api/bookings`, {
+// { serviceId, addon, prepay, date, time, name, email } -> { clientSecret, paymentIntentId, amount }
+export function createPaymentIntent(p) {
+  return request('/api/create-payment-intent', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ services: serviceIds(p), coupon: p.prepay ? 'PREPAY' : '', date: p.date, time: p.time, name: p.name, email: p.email }),
   })
-  const data = await r.json().catch(() => ({}))
-  if (!r.ok) throw new Error(data.error || 'Could not save your booking. Please call us.')
-  return data.booking || { ...body, id: data.id }
 }
 
-export const workerConnected = hasWorker
-
-// Amount is computed server-side from serviceId/addon/prepay — never trusted from the client.
-export async function createPaymentIntent({ serviceId, addon, prepay, email }) {
-  if (!hasWorker()) throw new Error('Online payment is not connected yet. Choose “pay later” or call us.')
-  const r = await fetch(`${WORKER_URL}/api/create-payment-intent`, {
+// Booking fields + optional paymentIntentId. Without it the booking is "Pay Later"; with it the
+// Worker verifies the PaymentIntent with Stripe before saving the booking as Paid.
+export async function createBooking(p) {
+  const data = await request('/api/bookings', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ serviceId, addon, prepay, email }),
+    body: JSON.stringify({
+      services: serviceIds(p),
+      date: p.date, time: p.time,
+      name: p.name, phone: p.phone, email: p.email, vehicle: p.vehicle, address: p.address,
+      payLater: !p.paymentIntentId,
+      paymentIntentId: p.paymentIntentId || undefined,
+    }),
   })
-  const data = await r.json().catch(() => ({}))
-  if (!r.ok || !data.clientSecret) throw new Error(data.error || 'Payment could not be started.')
-  return data
+  return { ...p, id: data.id, payment_status: data.payment_status, status: data.payment_status, total: data.total }
 }
 
 export const pending = {

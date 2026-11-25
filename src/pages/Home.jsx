@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Phone, ArrowRight, Check, Plus, CalendarDays, Truck, Sparkles, KeyRound,
-  ShieldCheck, Droplets, Clock3, BadgeDollarSign, MapPin, ChevronDown, X, ChevronLeft, ChevronRight,
+  Phone, ArrowRight, Check, CalendarDays, Truck, Sparkles, KeyRound,
+  ShieldCheck, Droplets, Clock3, BadgeDollarSign, MapPin, X, ChevronLeft, ChevronRight,
 } from 'lucide-react'
-import { BUSINESS, PACKAGES, ADDON } from '../config'
+import { BUSINESS } from '../config'
+import { Packages, Reviews, Faq, CtaBand, AreaChips } from '../components/Sections'
 import useReveal from '../components/useReveal'
 
 const TICKER = ['Triple-Stage Vacuuming', 'Cloth & Carpet Extraction', 'Full Interior Shampooing', 'UV-Protectant Coating', 'Hand-Washed Exterior', 'Spot-Free Hand Drying', 'Detailed Rim Cleaning', 'Premium Tire Shine']
 
 const STEPS = [
-  { icon: CalendarDays, title: 'Pick your slot', text: 'Choose a package and a 30-minute arrival window online — any day of the week.' },
-  { icon: Truck, title: 'We roll up', text: 'We arrive at your home or office in Costa Mesa with everything we need.' },
+  { icon: CalendarDays, title: 'Pick your slot', text: 'Choose a package and a start time online, any day of the week from 8 AM to 5 PM.' },
+  { icon: Truck, title: 'We roll up', text: 'We arrive at your home or office in Costa Mesa with our own water and power.' },
   { icon: Sparkles, title: 'We detail', text: 'Vacuum, extract, shampoo, protect — package by package, panel by panel.' },
   { icon: KeyRound, title: 'Keys back', text: 'Walk out to a car that looks and smells like it just left the showroom.' },
 ]
@@ -20,24 +21,15 @@ const GALLERY = [
   { src: 'black-sedan', alt: 'Black sedan with a deep gloss finish', cap: 'Mirror-gloss finish', cls: 'g-tall' },
   { src: 'interior-brush', alt: 'Detailer brushing foam into a center console', cap: 'Console foam & brush' },
   { src: 'seat-extraction', alt: 'Upholstery extraction tool on a cloth seat', cap: 'Seat extraction' },
-  { src: 'headlight-restoration', alt: 'Headlight before and after cleaning', cap: 'Before / after', cls: 'g-tall' },
   { src: 'foam-wash', alt: 'Yellow car covered in snow foam', cap: 'Snow-foam hand wash', cls: 'g-wide' },
-  { src: 'blue-gloss', alt: 'Blue car with reflective paint under studio lights', cap: 'Studio reflection' },
+  { src: 'blue-gloss', alt: 'Blue car with a reflective, freshly washed finish', cap: 'Gloss finish', cls: 'g-tall' },
 ]
 
 const PROMISES = [
-  { icon: ShieldCheck, title: 'Walk-around check', text: 'We go over the car with you before we pack up. Missed spot? We fix it on the spot.' },
+  { icon: ShieldCheck, title: 'Satisfaction guarantee', text: 'Not happy with something? Tell us and we will make it right.' },
   { icon: BadgeDollarSign, title: 'Flat, posted prices', text: '$150 or $200 — plus $50 if you add the exterior. No surprise upcharges at the curb.' },
-  { icon: Droplets, title: 'Self-sufficient setup', text: 'We bring the tools and supplies. You just need a spot where we can park and work.' },
-  { icon: Clock3, title: 'Seven days a week', text: 'Weekday lunch break or Sunday morning — book whatever slot suits your schedule.' },
-]
-
-const FAQ = [
-  { q: 'Do you come to me?', a: `Yes — Clevra is fully mobile. We detail at your home, office or apartment across ${BUSINESS.city} and the surrounding cities listed above.` },
-  { q: 'What is the difference between Basic and Premium?', a: 'Basic is an interior refresh: triple-stage vacuum, full surface wipe-down and floor mat restoration. Premium adds dust elimination, interior glass, deep carpet cleaning, cloth & carpet extraction, full shampoo and a UV-protectant coating.' },
-  { q: 'Is the exterior included?', a: `Both packages focus on the interior. Add the ${ADDON.name} for +$${ADDON.price} during booking for a hand wash, rims, tires, door jambs and a spot-free hand dry.` },
-  { q: 'Do I have to pay online?', a: 'No. You can prepay online and save $15 with code PREPAY, or choose “pay later” and settle up when the job is done.' },
-  { q: 'How do I reschedule?', a: `Just call or text ${BUSINESS.phoneDisplay} and we will move your appointment to a new slot.` },
+  { icon: Droplets, title: 'Self-sufficient setup', text: 'We bring our own water and power, and we use eco-friendly products. You just need a spot where we can work.' },
+  { icon: Clock3, title: 'Every day, 8 AM – 5 PM', text: 'Weekday lunch break or Sunday morning: pick any start time from 8 AM to 5 PM.' },
 ]
 
 function Lightbox({ index, onClose, onMove }) {
@@ -63,7 +55,6 @@ function Lightbox({ index, onClose, onMove }) {
 
 export default function Home() {
   useReveal()
-  const [faqOpen, setFaqOpen] = useState(0)
   const [lb, setLb] = useState(null)
 
   return (
@@ -73,12 +64,12 @@ export default function Home() {
         <div className="hero__brush" aria-hidden="true" />
         <div className="container hero__grid">
           <div className="hero__copy">
-            <p className="eyebrow mono">// Mobile car detailing · {BUSINESS.city}, CA</p>
-            <h1 className="hero__title">
+            <h1 className="eyebrow mono">// Mobile car detailing in {BUSINESS.city}, CA</h1>
+            <p className="hero__title">
               Showroom shine,<br /><span className="gold-text">delivered</span> to your driveway.
-            </h1>
+            </p>
             <p className="hero__lede">
-              Clevra brings deep interior detailing and hand-wash exteriors to your home or office — booked online in under a minute.
+              Clevra brings deep interior detailing, plus an optional hand-wash exterior, to your home or office with our own water and power.
             </p>
             <div className="hero__actions">
               <Link to="/book" className="btn btn-blade btn-lg">Book Online <ArrowRight size={18} /></Link>
@@ -86,7 +77,7 @@ export default function Home() {
             </div>
             <dl className="hero__specs">
               <div><dt className="mono">From</dt><dd>$150</dd></div>
-              <div><dt className="mono">Open</dt><dd>7 days</dd></div>
+              <div><dt className="mono">Open</dt><dd>7 days, 8–5</dd></div>
               <div><dt className="mono">Setup</dt><dd>We come to you</dd></div>
             </dl>
           </div>
@@ -107,51 +98,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── PACKAGES (light platinum section) ── */}
-      <section id="packages" className="packages">
-        <div className="container">
-          <header className="sec-head reveal">
-            <p className="eyebrow mono">01 — The menu</p>
-            <h2>Two packages. <span className="muted">One standard.</span></h2>
-            <p className="sec-head__sub">Pick the interior depth you need, then add the exterior if you want the full turnaround.</p>
-          </header>
-
-          <div className="pk-grid">
-            {PACKAGES.map((p, i) => (
-              <article key={p.id} className={`pk reveal ${p.featured ? 'pk--featured' : ''}`} style={{ '--d': `${i * 90}ms` }}>
-                <div className="pk__head">
-                  <span className="pk__tag mono">{p.tag}</span>
-                  <h3>{p.name}</h3>
-                  <p>{p.blurb}</p>
-                </div>
-                <div className="pk__price"><sup>$</sup>{p.price}</div>
-                <ul className="pk__list">
-                  {p.features.map((f) => <li key={f}><Check size={16} strokeWidth={3} />{f}</li>)}
-                </ul>
-                <div className="pk__foot mono">{p.features.length} steps · interior</div>
-              </article>
-            ))}
-          </div>
-
-          <article className="addon reveal">
-            <div className="addon__label">
-              <span className="addon__plus"><Plus size={20} strokeWidth={3} /></span>
-              <div>
-                <span className="mono addon__kicker">Optional add-on</span>
-                <h3>{ADDON.name} <em>+${ADDON.price}</em></h3>
-              </div>
-            </div>
-            <ul className="addon__list">
-              {ADDON.features.map((f) => <li key={f}><Check size={15} strokeWidth={3} />{f}</li>)}
-            </ul>
-          </article>
-
-          <div className="packages__cta reveal">
-            <Link to="/book" className="btn btn-dark btn-lg">Book now <ArrowRight size={18} /></Link>
-            <span className="mono">Prepay online & save $15</span>
-          </div>
-        </div>
-      </section>
+      <Packages />
 
       {/* ── PROCESS: horizontal rail ── */}
       <section id="process" className="process">
@@ -223,9 +170,11 @@ export default function Home() {
           <div className="area__copy reveal">
             <p className="eyebrow mono">05 — Service area</p>
             <h2>Based in {BUSINESS.city}.<br />Detailing all around it.</h2>
-            <ul className="area__list">
-              {BUSINESS.serviceArea.map((c) => <li key={c}><MapPin size={14} />{c}</li>)}
-            </ul>
+            <p className="area__intro">
+              We detail cars all over Costa Mesa, from {BUSINESS.homeAreas.slice(0, 3).join(', ')} to {BUSINESS.homeAreas.slice(3, 5).join(' and ')},
+              and in these nearby cities and neighborhoods at the same prices:
+            </p>
+            <AreaChips />
             <p className="area__note">Not on the list? Call {BUSINESS.phoneDisplay} — we can usually make it work.</p>
           </div>
           <div className="area__map reveal">
@@ -239,40 +188,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section id="faq" className="faq">
-        <div className="container faq__grid">
-          <header className="sec-head reveal">
-            <p className="eyebrow mono">06 — Questions</p>
-            <h2>Good to know.</h2>
-          </header>
-          <div className="faq__list">
-            {FAQ.map((f, i) => {
-              const open = faqOpen === i
-              return (
-                <div key={f.q} className={`faq__item reveal ${open ? 'is-open' : ''}`}>
-                  <button className="faq__q" aria-expanded={open} onClick={() => setFaqOpen(open ? -1 : i)}>
-                    <span>{f.q}</span><ChevronDown size={20} />
-                  </button>
-                  <div className="faq__a"><div><p>{f.a}</p></div></div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA BAND ── */}
-      <section className="cta-band">
-        <div className="cta-band__bg" style={{ backgroundImage: 'url(/images/foam-wash.webp)' }} aria-hidden="true" />
-        <div className="container cta-band__inner reveal">
-          <h2>Your car. Your driveway.<br /><span className="gold-text">Our detail.</span></h2>
-          <div className="cta-band__actions">
-            <Link to="/book" className="btn btn-blade btn-lg">Book Online <ArrowRight size={18} /></Link>
-            <a href={BUSINESS.phoneHref} className="btn btn-steel btn-lg"><Phone size={18} /> Call Now</a>
-          </div>
-        </div>
-      </section>
+      <Reviews />
+      <Faq />
+      <CtaBand />
     </>
   )
 }

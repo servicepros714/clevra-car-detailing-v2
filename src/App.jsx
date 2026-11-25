@@ -9,6 +9,9 @@ import Book from './pages/Book'
 import Checkout from './pages/Checkout'
 import Confirmation from './pages/Confirmation'
 import NotFound from './pages/NotFound'
+import Landing from './pages/Landing'
+import Seo from './components/Seo'
+import { LANDING_PAGES } from './lib/pages'
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation()
@@ -28,10 +31,14 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <Seo />
       <Navbar minimal={flow} />
       <main className={flow ? 'flow-main' : ''}>
         <Routes>
           <Route path="/" element={<Home />} />
+          {LANDING_PAGES.map((page) => (
+            <Route key={page.path} path={page.path} element={<Landing page={page} />} />
+          ))}
           <Route path="/book" element={<Book />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/confirmation" element={<Confirmation />} />
