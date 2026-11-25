@@ -12,7 +12,10 @@
 export const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://clevracardetailingcostamesa.site').replace(/\/$/, '')
 
 // Google Business Profile, used in the schema (sameAs). Leave '' until known.
-export const GOOGLE_PROFILE_URL = ''
+export const GOOGLE_PROFILE_URL = 'https://www.google.com/search?kgmid=/g/11msg57ftz&q=Clevra+Car+Detailing'
+
+// Shown above the reviews (not in the schema). Update together with the profile.
+export const GOOGLE_RATING = { value: '5.0', count: 34, asOf: 'Nov 2026' }
 
 export const BUSINESS = {
   name: 'Clevra Car Detailing',
@@ -95,7 +98,18 @@ export const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''
 // Real Google reviews only, as { name: 'First L.', text: '...' } (first name + last initial,
 // typos fixed; leave out reviews that read like a shop visit). The section and its menu
 // link stay hidden while this is empty.
-export const REVIEWS = []
+// From the Google profile, Nov 2026 (all 5 stars). Left out: "Danny boy" (no real name).
+export const REVIEWS = [
+  { name: 'Chase C.', text: 'Details all my cars. Does a great job.' },
+  { name: 'Teodoro F.', text: 'Great experience. Good job.' },
+  { name: 'John D.', text: 'Nice job!!!' },
+  { name: 'Ethan M.', text: 'Great job!' },
+  { name: 'Shayne B.', text: 'Nice job.' },
+  { name: 'Bryand H.', text: 'Great job.' },
+  { name: 'Trung V.', text: 'Great job.' },
+  { name: 'Albert T.', text: 'Nice job.' },
+  { name: 'Marcus A.', text: 'Great job.' },
+]
 
 // Home page FAQ. Shown on the page and used for the FAQPage schema, so keep both in sync.
 export const FAQS = [

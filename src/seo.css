@@ -249,3 +249,7 @@ p.hero__title {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Reviews: rating line with a link to the Google profile */
+.rev-rating { color: var(--chrome); }
+.rev-rating a { color: var(--gold-hi); font-weight: 600; }
